@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Circuito LOOP BB - Campos Atualizados</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .actions-column {
+            width: 180px;
+        }
+        .modal {
+            transition: opacity 0.25s ease;
+        }
+        .modal-active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-inactive {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .custom-table th, .custom-table td {
+            padding: 0.75rem;
+            border-width: 1px;
+            border-color: #e5e7eb; /* border-gray-200 */
+            text-align: left;
+        }
+        .custom-table th {
+            background-color: #3b82f6; /* bg-blue-600 */
+            color: white;
+        }
+        .custom-table tr:nth-child(even) {
+            background-color: #f9fafb; /* bg-gray-50 */
+        }
+        .input-error {
+            border-color: #ef4444; /* border-red-500 */
+        }
+        .error-message {
+            color: #ef4444; /* text-red-500 */
+            font-size: 0.875rem; /* text-sm */
+            margin-top: 0.25rem; /* mt-1 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 md:p-8">
+    <div class="container mx-auto max-w-5xl bg-white p-6 rounded-lg shadow-xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-blue-700">Controle de Estudos - Circuito LOOP BB</h1>
+        </header>
+
+        <section id="addFormSection" class="mb-8 p-6 bg-gray-50 rounded-lg shadow">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">Adicionar Nova Tarefa</h2>
+            <form id="crudForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="materias" class="block text-sm font-medium text-gray-700 mb-1">Matérias:</label>
+                        <select id="materias" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">Selecione uma matéria</option>
+                            <option value="Português">Português</option>
+                            <option value="Informática">Informática</option>
+                            <option value="Conhecimentos Bancários">Conhecimentos Bancários</option>
+                            <option value="Vendas e Negociação">Vendas e Negociação</option>
+                            <option value="Matemática Financeira">Matemática Financeira</option>
+                            <option value="Matemática">Matemática</option>
+                            <option value="Prova Discursiva (redação)">Prova Discursiva (redação)</option>
+                            <option value="Lingua Inglesa">Lingua Inglesa</option>
+                            <option value="Revisão do Ciclo">Revisão do Ciclo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="comeco" class="block text-sm font-medium text-gray-700 mb-1">Hora Início:</label>
+                        <input type="time" id="comeco" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="HH:MM">
+                        <p id="comecoError" class="error-message" style="display:none;">Formato de hora inválido (HH:MM).</p>
+                    </div>
+                    <div>
+                        <label for="finalItem" class="block text-sm font-medium text-gray-700 mb-1">Hora Fim:</label>
+                        <input type="time" id="finalItem" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="HH:MM">
+                        <p id="finalItemError" class="error-message" style="display:none;">Formato de hora inválido (HH:MM).</p>
+                    </div>
+                    <div>
+                        <label for="data" class="block text-sm font-medium text-gray-700 mb-1">Data:</label>
+                        <input type="date" id="data" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="obs" class="block text-sm font-medium text-gray-700 mb-1">Observações:</label>
+                        <textarea id="obs" rows="3" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                    </div>
+                    <div>
+                        <label for="revisaoD1" class="block text-sm font-medium text-gray-700 mb-1">Revisão D1:</label>
+                        <select id="revisaoD1" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">Selecione um status</option>
+                            <option value="Feito">Feito</option>
+                            <option value="Não feito">Não feito</option>
+                            <option value="Pendente">Pendente</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="revisaoD2" class="block text-sm font-medium text-gray-700 mb-1">Revisão D2:</label>
+                        <select id="revisaoD2" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            <option value="">Selecione um status</option>
+                            <option value="Feito">Feito</option>
+                            <option value="Não feito">Não feito</option>
+                            <option value="Pendente">Pendente</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label for="questoes" class="block text-sm font-medium text-gray-700 mb-1">Questões (Ex: 8/10):</label>
+                        <input type="text" id="questoes" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Certas/Respondidas">
+                        <p id="questoesError" class="error-message" style="display:none;">Formato inválido. Use: número/número (ex: 8/10).</p>
+                    </div>
+                </div>
+                <div class="flex justify-end">
+                    <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Adicionar Tarefa
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <section id="tasksSection" class="mb-8">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-6">Tarefas Registradas</h2>
+            <div class="overflow-x-auto bg-white rounded-lg shadow">
+                <table id="crudTable" class="min-w-full divide-y divide-gray-200 custom-table">
+                    <thead class="bg-blue-600 text-white">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Matérias</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Hora Início</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Hora Fim</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Data</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Obs</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Revisão D1</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Revisão D2</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">Questões</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider actions-column">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <div id="updateModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
+            <div class="relative bg-white rounded-lg shadow-xl w-full max-w-2xl p-6 md:p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-700">Editar Tarefa</h2>
+                    <button onclick="cancelUpdate()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <form id="updateForm" class="space-y-6">
+                    <input type="hidden" id="updateId">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="updateMaterias" class="block text-sm font-medium text-gray-700 mb-1">Matérias:</label>
+                            <select id="updateMaterias" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option value="">Selecione uma matéria</option>
+                                <option value="Português">Português</option>
+                                <option value="Informática">Informática</option>
+                                <option value="Conhecimentos Bancários">Conhecimentos Bancários</option>
+                                <option value="Vendas e Negociação">Vendas e Negociação</option>
+                                <option value="Matemática Financeira">Matemática Financeira</option>
+                                <option value="Matemática">Matemática</option>
+                                <option value="Prova Discursiva (redação)">Prova Discursiva (redação)</option>
+                                <option value="Lingua Inglesa">Lingua Inglesa</option>
+                                <option value="Revisão do Ciclo">Revisão do Ciclo</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="updateComeco" class="block text-sm font-medium text-gray-700 mb-1">Hora Início:</label>
+                            <input type="time" id="updateComeco" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="HH:MM">
+                             <p id="updateComecoError" class="error-message" style="display:none;">Formato de hora inválido (HH:MM).</p>
+                        </div>
+                        <div>
+                            <label for="updateFinal" class="block text-sm font-medium text-gray-700 mb-1">Hora Fim:</label>
+                            <input type="time" id="updateFinal" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="HH:MM">
+                            <p id="updateFinalError" class="error-message" style="display:none;">Formato de hora inválido (HH:MM).</p>
+                        </div>
+                        <div>
+                            <label for="updateData" class="block text-sm font-medium text-gray-700 mb-1">Data:</label>
+                            <input type="date" id="updateData" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="updateObs" class="block text-sm font-medium text-gray-700 mb-1">Observações:</label>
+                            <textarea id="updateObs" rows="3" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                        </div>
+                        <div>
+                            <label for="updateRevisaoD1" class="block text-sm font-medium text-gray-700 mb-1">Revisão D1:</label>
+                             <select id="updateRevisaoD1" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option value="">Selecione um status</option>
+                                <option value="Feito">Feito</option>
+                                <option value="Não feito">Não feito</option>
+                                <option value="Pendente">Pendente</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="updateRevisaoD2" class="block text-sm font-medium text-gray-700 mb-1">Revisão D2:</label>
+                            <select id="updateRevisaoD2" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                                <option value="">Selecione um status</option>
+                                <option value="Feito">Feito</option>
+                                <option value="Não feito">Não feito</option>
+                                <option value="Pendente">Pendente</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="updateQuestoes" class="block text-sm font-medium text-gray-700 mb-1">Questões (Ex: 8/10):</label>
+                            <input type="text" id="updateQuestoes" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="Certas/Respondidas">
+                            <p id="updateQuestoesError" class="error-message" style="display:none;">Formato inválido. Use: número/número (ex: 8/10).</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="cancelUpdate()" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                            Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="deleteConfirmModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center modal modal-inactive p-4">
+            <div class="relative bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+                <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Confirmar Exclusão</h3>
+                <p class="text-sm text-gray-500 mb-6">Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.</p>
+                <div class="flex justify-end space-x-3">
+                    <button id="cancelDeleteButton" type="button" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Cancelar
+                    </button>
+                    <button id="confirmDeleteButton" type="button" class="py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                        Excluir
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Seletores de Elementos do DOM
+        const crudForm = document.getElementById('crudForm');
+        const crudTableBody = document.querySelector('#crudTable tbody');
+        const updateModal = document.getElementById('updateModal');
+        const updateForm = document.getElementById('updateForm');
+        const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+        const cancelDeleteButton = document.getElementById('cancelDeleteButton');
+        const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+
+        // Elementos de erro
+        const comecoError = document.getElementById('comecoError');
+        const finalItemError = document.getElementById('finalItemError');
+        const updateComecoError = document.getElementById('updateComecoError');
+        const updateFinalError = document.getElementById('updateFinalError');
+        const questoesError = document.getElementById('questoesError');
+        const updateQuestoesError = document.getElementById('updateQuestoesError');
+
+
+        const LS_KEY = 'circuitoLoopData_v4'; // Chave para localStorage (v4 para indicar novas mudanças)
+        let itemIndexToDelete = null;
+
+        // RegEx
+        const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/;
+        const questoesRegex = /^\d+\s*\/\s*\d+$/;
+
+
+        /**
+         * Valida um valor de hora usando RegEx.
+         * @param {string} timeValue - O valor da hora a ser validado.
+         * @returns {boolean} True se válido, false caso contrário.
+         */
+        function isValidTime(timeValue) {
+            if (!timeValue) return true; // Permite campos de hora vazios
+            return timeRegex.test(timeValue);
+        }
+
+        /**
+         * Valida o formato do campo Questões (numero/numero).
+         * @param {string} questoesValue - O valor do campo questões.
+         * @returns {boolean} True se válido, false caso contrário.
+         */
+        function isValidQuestoesFormat(questoesValue) {
+            if (!questoesValue) return true; // Permite campo vazio
+            return questoesRegex.test(questoesValue);
+        }
+
+
+        /**
+         * Mostra ou esconde mensagem de erro para um campo de input.
+         * @param {HTMLElement} inputElement - O elemento input.
+         * @param {HTMLElement} errorElement - O elemento p para a mensagem de erro.
+         * @param {boolean} isValid - Se o valor é válido.
+         */
+        function toggleInputError(inputElement, errorElement, isValid) {
+            if (isValid) {
+                inputElement.classList.remove('input-error');
+                errorElement.style.display = 'none';
+            } else {
+                inputElement.classList.add('input-error');
+                errorElement.style.display = 'block';
+            }
+        }
+
+
+        function getItems() {
+            try {
+                const items = localStorage.getItem(LS_KEY);
+                return items ? JSON.parse(items) : [];
+            } catch (error) {
+                console.error("Erro ao carregar itens do localStorage:", error);
+                return [];
+            }
+        }
+
+        function saveItems(items) {
+            try {
+                localStorage.setItem(LS_KEY, JSON.stringify(items));
+            } catch (error) {
+                console.error("Erro ao salvar itens no localStorage:", error);
+            }
+        }
+
+        function renderTable() {
+            crudTableBody.innerHTML = '';
+            const items = getItems();
+
+            if (items.length === 0) {
+                const row = crudTableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 9;
+                cell.textContent = 'Nenhuma tarefa registrada ainda.';
+                cell.className = 'text-center text-gray-500 py-4';
+                return;
+            }
+
+            items.forEach((item, index) => {
+                const row = crudTableBody.insertRow();
+                row.insertCell().textContent = item.materias || '-';
+                row.insertCell().textContent = item.comeco || '-';
+                row.insertCell().textContent = item.finalItem || '-';
+                row.insertCell().textContent = item.data ? new Date(item.data + 'T00:00:00').toLocaleDateString('pt-BR') : '-';
+                row.insertCell().textContent = item.obs || '-';
+                row.insertCell().textContent = item.revisaoD1 || '-';
+                row.insertCell().textContent = item.revisaoD2 || '-';
+                row.insertCell().textContent = item.questoes || '-';
+
+                const actionsCell = row.insertCell();
+                actionsCell.classList.add('actions-column', 'space-x-2', 'whitespace-nowrap');
+
+                const editButton = document.createElement('button');
+                editButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline-block" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>Editar`;
+                editButton.classList.add('py-1', 'px-3', 'border', 'border-transparent', 'text-sm', 'font-medium', 'rounded-md', 'text-white', 'bg-yellow-500', 'hover:bg-yellow-600', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-yellow-400', 'inline-flex', 'items-center');
+                editButton.onclick = () => showUpdateForm(index);
+                actionsCell.appendChild(editButton);
+
+                const deleteButton = document.createElement('button');
+                deleteButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline-block" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>Excluir`;
+                deleteButton.classList.add('py-1', 'px-3', 'border', 'border-transparent', 'text-sm', 'font-medium', 'rounded-md', 'text-white', 'bg-red-600', 'hover:bg-red-700', 'focus:outline-none', 'focus:ring-2', 'focus:ring-offset-2', 'focus:ring-red-500', 'inline-flex', 'items-center');
+                deleteButton.onclick = () => confirmDeletion(index);
+                actionsCell.appendChild(deleteButton);
+            });
+        }
+
+        crudForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const comecoInput = document.getElementById('comeco');
+            const finalItemInput = document.getElementById('finalItem');
+            const questoesInput = document.getElementById('questoes');
+
+            let formIsValid = true;
+
+            const isComecoValid = isValidTime(comecoInput.value);
+            toggleInputError(comecoInput, comecoError, isComecoValid);
+            if (!isComecoValid) formIsValid = false;
+
+            const isFinalItemValid = isValidTime(finalItemInput.value);
+            toggleInputError(finalItemInput, finalItemError, isFinalItemValid);
+            if (!isFinalItemValid) formIsValid = false;
+
+            const isQuestoesValid = isValidQuestoesFormat(questoesInput.value);
+            toggleInputError(questoesInput, questoesError, isQuestoesValid);
+            if (!isQuestoesValid) formIsValid = false;
+
+
+            if (!formIsValid) {
+                alert("Por favor, corrija os campos inválidos.");
+                return;
+            }
+
+
+            const newItem = {
+                materias: document.getElementById('materias').value, // Select value
+                comeco: comecoInput.value,
+                finalItem: finalItemInput.value,
+                data: document.getElementById('data').value,
+                obs: document.getElementById('obs').value.trim(),
+                revisaoD1: document.getElementById('revisaoD1').value, // Select value
+                revisaoD2: document.getElementById('revisaoD2').value, // Select value
+                questoes: questoesInput.value.trim(),
+            };
+            const items = getItems();
+            items.push(newItem);
+            saveItems(items);
+            renderTable();
+            crudForm.reset();
+            // Limpa as mensagens de erro após o sucesso
+            toggleInputError(comecoInput, comecoError, true);
+            toggleInputError(finalItemInput, finalItemError, true);
+            toggleInputError(questoesInput, questoesError, true);
+        });
+
+        function showUpdateForm(index) {
+            const items = getItems();
+            const itemToUpdate = items[index];
+            if (!itemToUpdate) return;
+
+            document.getElementById('updateId').value = index;
+            document.getElementById('updateMaterias').value = itemToUpdate.materias;
+            document.getElementById('updateComeco').value = itemToUpdate.comeco;
+            document.getElementById('updateFinal').value = itemToUpdate.finalItem;
+            document.getElementById('updateData').value = itemToUpdate.data;
+            document.getElementById('updateObs').value = itemToUpdate.obs;
+            document.getElementById('updateRevisaoD1').value = itemToUpdate.revisaoD1;
+            document.getElementById('updateRevisaoD2').value = itemToUpdate.revisaoD2;
+            document.getElementById('updateQuestoes').value = itemToUpdate.questoes;
+
+            // Limpa erros anteriores ao abrir o modal
+            toggleInputError(document.getElementById('updateComeco'), updateComecoError, true);
+            toggleInputError(document.getElementById('updateFinal'), updateFinalError, true);
+            toggleInputError(document.getElementById('updateQuestoes'), updateQuestoesError, true);
+
+
+            updateModal.classList.remove('modal-inactive');
+            updateModal.classList.add('modal-active');
+        }
+
+        function cancelUpdate() {
+            updateModal.classList.remove('modal-active');
+            updateModal.classList.add('modal-inactive');
+            updateForm.reset();
+            // Limpa as mensagens de erro ao cancelar
+            toggleInputError(document.getElementById('updateComeco'), updateComecoError, true);
+            toggleInputError(document.getElementById('updateFinal'), updateFinalError, true);
+            toggleInputError(document.getElementById('updateQuestoes'), updateQuestoesError, true);
+        }
+
+        updateForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const index = parseInt(document.getElementById('updateId').value, 10);
+            const items = getItems();
+
+            const updateComecoInput = document.getElementById('updateComeco');
+            const updateFinalInput = document.getElementById('updateFinal');
+            const updateQuestoesInput = document.getElementById('updateQuestoes');
+
+            let formIsValid = true;
+
+            const isUpdateComecoValid = isValidTime(updateComecoInput.value);
+            toggleInputError(updateComecoInput, updateComecoError, isUpdateComecoValid);
+            if(!isUpdateComecoValid) formIsValid = false;
+
+            const isUpdateFinalValid = isValidTime(updateFinalInput.value);
+            toggleInputError(updateFinalInput, updateFinalError, isUpdateFinalValid);
+            if(!isUpdateFinalValid) formIsValid = false;
+
+            const isUpdateQuestoesValid = isValidQuestoesFormat(updateQuestoesInput.value);
+            toggleInputError(updateQuestoesInput, updateQuestoesError, isUpdateQuestoesValid);
+            if(!isUpdateQuestoesValid) formIsValid = false;
+
+            if (!formIsValid) {
+                alert("Por favor, corrija os campos inválidos no formulário de edição.");
+                return;
+            }
+
+
+            if (items[index] !== undefined) {
+                items[index] = {
+                    materias: document.getElementById('updateMaterias').value, // Select value
+                    comeco: updateComecoInput.value,
+                    finalItem: updateFinalInput.value,
+                    data: document.getElementById('updateData').value,
+                    obs: document.getElementById('updateObs').value.trim(),
+                    revisaoD1: document.getElementById('updateRevisaoD1').value, // Select value
+                    revisaoD2: document.getElementById('updateRevisaoD2').value, // Select value
+                    questoes: updateQuestoesInput.value.trim(),
+                };
+                saveItems(items);
+                renderTable();
+                cancelUpdate();
+            } else {
+                console.error("Item não encontrado para atualização no índice:", index);
+                 alert("Erro: Item não encontrado para atualização.");
+            }
+        });
+
+        function confirmDeletion(index) {
+            itemIndexToDelete = index;
+            deleteConfirmModal.classList.remove('modal-inactive');
+            deleteConfirmModal.classList.add('modal-active');
+        }
+
+        cancelDeleteButton.addEventListener('click', () => {
+            deleteConfirmModal.classList.remove('modal-active');
+            deleteConfirmModal.classList.add('modal-inactive');
+            itemIndexToDelete = null;
+        });
+
+        confirmDeleteButton.addEventListener('click', () => {
+            if (itemIndexToDelete !== null) {
+                const items = getItems();
+                items.splice(itemIndexToDelete, 1);
+                saveItems(items);
+                renderTable();
+                deleteConfirmModal.classList.remove('modal-active');
+                deleteConfirmModal.classList.add('modal-inactive');
+                itemIndexToDelete = null;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', renderTable);
+    </script>
+</body>
+</html>
